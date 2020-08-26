@@ -26,7 +26,7 @@ resource "alicloud_security_group_rule" "egress_traffic" {
   type              = "egress"
   port_range        = "0/0"
   ip_protocol       = "all"
-  nic_type          = "internet"
+  nic_type          = "intranet"
   policy            = "accept"
   priority          = 1
   security_group_id = alicloud_security_group.cluster.id
@@ -38,7 +38,7 @@ resource "alicloud_security_group_rule" "cluster_egress_traffic" {
   type              = "egress"
   port_range        = "0/0"
   ip_protocol       = "all"
-  nic_type          = "internet"
+  nic_type          = "intranet"
   policy            = "accept"
   priority          = 1
   security_group_id = alicloud_security_group.cluster.id
@@ -80,7 +80,7 @@ resource "alicloud_security_group_rule" "ntp_egress_traffic" {
   type              = "egress"
   port_range        = "123/123"
   ip_protocol       = "udp"
-  nic_type          = "internet"
+  nic_type          = "intranet"
   policy            = "accept"
   priority          = 1
   security_group_id = alicloud_security_group.cluster.id

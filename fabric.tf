@@ -4,6 +4,10 @@ variable "key_pair" {
   default = ""
 }
 
+variable "public_key" {
+  default = ""
+}
+
 variable "cluster_name" {
   default = "mrRobot-runtime-fabric"
 }
@@ -21,7 +25,7 @@ variable "installer_url" {
 }
 
 variable "ami_name" {
-  default = "centos_7_8_x64_20G_alibase_20200717.vhd"
+  default = "^centos_7_8"
 }
 
 variable "ami_owner_id" {
@@ -159,7 +163,7 @@ locals {
   #gravity_volume_size_inbound_traffic_controller = "50"
   gravity_volume_device_name                     = "/dev/xvdb"
 
-  etcd_volume_type = "cloud_ssd"
+  etcd_volume_type = "cloud_efficiency"
   #etcd_volume_iops = "3000"
   etcd_volume_size = "60"
   etcd_device_name = "/dev/xvdc"
@@ -286,8 +290,8 @@ resource "alicloud_vswitch" "public" {
     count.index,
   )
 
-  count             = var.existing_vpc_id != "" ? 0 : length(data.alicloud_zones.available.zones[*].local_name)
-  availability_zone = element(data.alicloud_zones.available.zones[*].local_name, count.index)
+  count             = var.existing_vpc_id != "" ? 0 : length(data.alicloud_zones.available.zones[*].id)
+  availability_zone = element(data.alicloud_zones.available.zones[*].id, count.index)
 
   tags = {
     Name = "${var.cluster_name}-subnet"
@@ -308,6 +312,11 @@ resource "alicloud_route_table_attachment" "rta" {
   count          = length(alicloud_vswitch.public)
   vswitch_id     = element(alicloud_vswitch.public[*].id, count.index)
   route_table_id = alicloud_route_table.rt[0].id
+}
+
+resource "alicloud_key_pair" "key"{
+  key_name  = var.key_pair
+  public_key = var.public_key
 }
 
 /** 
@@ -339,11 +348,12 @@ resource "alicloud_route_table_attachment" "rta" {
 */
 
 resource "alicloud_instance" "installer_node" {
-  image_id                      = data.alicloud_images.nodes.id
+  image_id                      = data.alicloud_images.nodes.images[0].id
   instance_type                 = var.instance_type_controller
   internet_max_bandwidth_out    = var.enable_public_ips ? 100 : 0
   vswitch_id                    = element(concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id), 0)
   security_groups               = [alicloud_security_group.cluster.id]
+  instance_name                 = "${var.cluster_name}-controller"
   
   key_name  = var.key_pair
   count     = "1"
@@ -364,7 +374,7 @@ resource "alicloud_instance" "installer_node" {
 
   # gravity/docker data device
   data_disks {
-    category              = local.gravity_volume_type
+    #category              = local.gravity_volume_type
     name                  = local.gravity_volume_device_name
     size                  = local.gravity_volume_size
     delete_with_instance  = local.volume_delete_on_termination
@@ -372,7 +382,7 @@ resource "alicloud_instance" "installer_node" {
 
   # etcd device
   data_disks {
-    category              = local.etcd_volume_type
+    #category              = local.etcd_volume_type
     name                  = local.etcd_device_name
     size                  = local.etcd_volume_size
     delete_with_instance = local.volume_delete_on_termination
@@ -381,10 +391,11 @@ resource "alicloud_instance" "installer_node" {
 
 
 resource "alicloud_instance" "controller_node" {
-  image_id                      = data.alicloud_images.nodes.id
+  image_id                      = data.alicloud_images.nodes.images[0].id
   instance_type                 = var.instance_type_controller
   internet_max_bandwidth_out    = var.enable_public_ips ? 100 : 0
   security_groups               = [alicloud_security_group.cluster.id]
+  instance_name                 = "${var.cluster_name}-controller-${count.index}"
 
   vswitch_id                    = element(
     concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id),
@@ -411,7 +422,7 @@ resource "alicloud_instance" "controller_node" {
 
   # gravity/docker data device
   data_disks {
-    category              = local.gravity_volume_type
+    #category              = local.gravity_volume_type
     name                  = local.gravity_volume_device_name
     size                  = local.gravity_volume_size
     delete_with_instance  = local.volume_delete_on_termination
@@ -419,7 +430,7 @@ resource "alicloud_instance" "controller_node" {
 
   # etcd device
   data_disks {
-    category              = local.etcd_volume_type
+    #category              = local.etcd_volume_type
     name                  = local.etcd_device_name
     size                  = local.etcd_volume_size
     delete_with_instance = local.volume_delete_on_termination
@@ -429,10 +440,11 @@ resource "alicloud_instance" "controller_node" {
 
 
 resource "alicloud_instance" "worker_node" {
-  image_id                      = data.alicloud_images.nodes.id
+  image_id                      = data.alicloud_images.nodes.images[0].id
   instance_type                 = var.instance_type_worker
   internet_max_bandwidth_out    = var.enable_public_ips ? 100 : 0
   security_groups               = [alicloud_security_group.cluster.id]
+  instance_name                 = "${var.cluster_name}-worker-${count.index}"
 
   vswitch_id                    = element(
     concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id),
@@ -459,10 +471,10 @@ resource "alicloud_instance" "worker_node" {
   
   # gravity/docker data device
   data_disks  {
-    category              = local.gravity_volume_type
+    #category              = local.gravity_volume_type
     name                  = local.gravity_volume_device_name
     size                  = local.gravity_volume_size
-    delete_with_instance = local.volume_delete_on_termination
+    delete_with_instance  = local.volume_delete_on_termination
   }
 }
 

@@ -12,7 +12,7 @@ resource "alicloud_security_group_rule" "ssh" {
   type              = "ingress"
   port_range        = "22/22"
   ip_protocol       = "tcp"
-  nic_type          = "internet"
+  nic_type          = "intranet"
   policy            = "accept"
   priority          = 1
   security_group_id = alicloud_security_group.cluster.id
