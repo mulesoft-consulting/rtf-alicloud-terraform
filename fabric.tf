@@ -155,15 +155,15 @@ data "alicloud_images" "nodes" {
 
 
 locals {
-  root_volume_type = "cloud_efficiency"
+  root_volume_type = "cloud_essd"
   root_volume_size = "90"
 
-  gravity_volume_type                            = "cloud_efficiency"
+  gravity_volume_type                            = "cloud_essd"
   gravity_volume_size                            = "250"
   #gravity_volume_size_inbound_traffic_controller = "50"
   gravity_volume_device_name                     = "/dev/xvdb"
 
-  etcd_volume_type = "cloud_efficiency"
+  etcd_volume_type = "cloud_essd"
   #etcd_volume_iops = "3000"
   etcd_volume_size = "60"
   etcd_device_name = "/dev/xvdc"
@@ -369,12 +369,13 @@ resource "alicloud_instance" "installer_node" {
   }
 
   user_data = data.template_cloudinit_config.installer.rendered
+  
   system_disk_category  = local.root_volume_type
   system_disk_size      = local.root_volume_size
 
   # gravity/docker data device
   data_disks {
-    #category              = local.gravity_volume_type
+    category              = local.gravity_volume_type
     name                  = local.gravity_volume_device_name
     size                  = local.gravity_volume_size
     delete_with_instance  = local.volume_delete_on_termination
@@ -382,7 +383,7 @@ resource "alicloud_instance" "installer_node" {
 
   # etcd device
   data_disks {
-    #category              = local.etcd_volume_type
+    category              = local.etcd_volume_type
     name                  = local.etcd_device_name
     size                  = local.etcd_volume_size
     delete_with_instance = local.volume_delete_on_termination
@@ -422,7 +423,7 @@ resource "alicloud_instance" "controller_node" {
 
   # gravity/docker data device
   data_disks {
-    #category              = local.gravity_volume_type
+    category              = local.gravity_volume_type
     name                  = local.gravity_volume_device_name
     size                  = local.gravity_volume_size
     delete_with_instance  = local.volume_delete_on_termination
@@ -430,7 +431,7 @@ resource "alicloud_instance" "controller_node" {
 
   # etcd device
   data_disks {
-    #category              = local.etcd_volume_type
+    category              = local.etcd_volume_type
     name                  = local.etcd_device_name
     size                  = local.etcd_volume_size
     delete_with_instance = local.volume_delete_on_termination
@@ -471,7 +472,7 @@ resource "alicloud_instance" "worker_node" {
   
   # gravity/docker data device
   data_disks  {
-    #category              = local.gravity_volume_type
+    category              = local.gravity_volume_type
     name                  = local.gravity_volume_device_name
     size                  = local.gravity_volume_size
     delete_with_instance  = local.volume_delete_on_termination

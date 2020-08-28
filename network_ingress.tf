@@ -33,7 +33,6 @@ resource "alicloud_security_group_rule" "installer_61008" {
   description       = "Installer agent ports"
 }
 
-
 resource "alicloud_security_group_rule" "installer_61022" {
   type              = "ingress"
   port_range        = "61022/61024"
@@ -45,7 +44,6 @@ resource "alicloud_security_group_rule" "installer_61022" {
   cidr_ip           = var.vpc_cidr
   description       = "Installer agent ports"
 }
-
 
 resource "alicloud_security_group_rule" "bandwidth" {
   type              = "ingress"
@@ -59,7 +57,6 @@ resource "alicloud_security_group_rule" "bandwidth" {
   description       = "Bandwidth checker utility"
 }
 
-
 resource "alicloud_security_group_rule" "dns_udp" {
   type              = "ingress"
   port_range        = "53/53"
@@ -72,7 +69,6 @@ resource "alicloud_security_group_rule" "dns_udp" {
   description       = "Internal cluster DNS"
 }
 
-
 resource "alicloud_security_group_rule" "dns_tcp" {
   type              = "ingress"
   port_range        = "53/53"
@@ -84,7 +80,6 @@ resource "alicloud_security_group_rule" "dns_tcp" {
   cidr_ip           = var.vpc_cidr
   description       = "Internal cluster DNS"
 }
-
 
 resource "alicloud_security_group_rule" "overlay" {
   type              = "ingress"
@@ -110,7 +105,6 @@ resource "alicloud_security_group_rule" "serf_7496" {
   description       = "Serf (Health check agents) peer to peer"
 }
 
-
 resource "alicloud_security_group_rule" "serf_7496_udp" {
   type              = "ingress"
   port_range        = "7496/7496"
@@ -122,7 +116,6 @@ resource "alicloud_security_group_rule" "serf_7496_udp" {
   cidr_ip           = var.vpc_cidr
   description       = "Serf (Health check agents) peer to peer"
 }
-
 
 resource "alicloud_security_group_rule" "serf_7373" {
   type              = "ingress"
