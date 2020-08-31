@@ -197,7 +197,7 @@ resource "alicloud_security_group_rule" "kubernetes_api_external" {
   policy            = "accept"
   priority          = 1
   security_group_id = alicloud_security_group.cluster.id
-  count             = length(var.kubernetes_api_cidr_blocks) == 0 ? 0 : 1
+  count             = var.kubernetes_api_cidr_blocks == "" ? 0 : 1
   cidr_ip           = var.kubernetes_api_cidr_blocks
   description       = "Kubernetes API server (ext)"
 }
@@ -282,7 +282,7 @@ resource "alicloud_security_group_rule" "ops_center_external" {
   policy            = "accept"
   priority          = 1
   security_group_id = alicloud_security_group.cluster.id
-  count             = length(var.ops_center_cidr_blocks) == 0 ? 0 : 1
+  count             = var.ops_center_cidr_blocks == "" ? 0 : 1
   cidr_ip           = var.ops_center_cidr_blocks
   description       = "OpsCenter UI"
 }

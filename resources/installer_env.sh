@@ -2,6 +2,7 @@
 
 mkdir -p /opt/anypoint/runtimefabric
 cat >> /opt/anypoint/runtimefabric/env <<EOF
+RTF_PRIVATE_IP=`curl  http://100.100.100.200/latest/meta-data/private-ipv4`
 RTF_NODE_ROLE=controller_node
 RTF_INSTALL_ROLE=leader
 RTF_INSTALL_PACKAGE_URL="${installer_url}"

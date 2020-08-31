@@ -86,6 +86,24 @@ $ terraform apply \
 6. Run the script.
 
 
+## COMMON ERRORS
+
+Sometimes the deployment takes a little bit of time to create all the stack and some elements take more time than others which can provoke a timeout kind of error that makes the deployment fail. 
+
+For example the following error 
+```bash
+Error: [ERROR] terraform-provider-alicloud/alicloud/resource_alicloud_instance.go:428: Resource alicloud_instance RunInstances Failed!!! [SDK alibaba-cloud-sdk-go ERROR]:
+SDK.ServerError
+ErrorCode: IncorrectVSwitchStatus
+Recommend: https://error-center.aliyun.com/status/search?Keyword=IncorrectVSwitchStatus&source=PopGw
+RequestId: EE42C3F4-F222-4E3C-A9DC-76F644031264
+Message: The current status of vSwitch does not support this operation.
+```
+This is provoked by the fact that the `VSwitch` resource is not completely ready and its status is not the one terraform is hoping for. 
+
+In order to correct that, just execute the apply once again. Terraform will automatically detect that you already have some elements of the stack and will build a new plan to suit your situation.
+
+
 ## Links
 
 - List of Alibaba regions: [link](https://www.alibabacloud.com/help/doc-detail/40654.htm)
