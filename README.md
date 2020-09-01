@@ -123,6 +123,7 @@ This is provoked by the fact that terraform is performing operation too quickly 
 
 ## Links
 
-- List of Alibaba regions: [link](https://www.alibabacloud.com/help/doc-detail/40654.htm)
+- List of Alibaba regions (codes): [link](https://www.alibabacloud.com/help/doc-detail/40654.htm)
+- List of Alibaba Zones (codes): [link](https://www.alibabacloud.com/help/doc-detail/89155.htm)
 - Runtime Fabric install guide for AWS: [link](https://docs.mulesoft.com/runtime-fabric/latest/install-aws)
 - Product Comparison AWS vs Alibaba: [link](http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/pdf/comparison-AlicloudlvsAWS-intl-en-2018-03-26.pdf)

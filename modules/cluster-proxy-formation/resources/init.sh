@@ -3,7 +3,7 @@
 yum update -y
 yum install nginx -y
 
-cat >> /etc/nginx/nginx.conf <<EOF
+cat << EOF > /etc/nginx/nginx.conf 
 user nginx;
 worker_processes auto;
 error_log /var/log/nginx/error.log;

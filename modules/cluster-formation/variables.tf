@@ -42,6 +42,14 @@ variable "instance_type_worker" {
   default = "ecs.r6e.large"
 }
 
+variable "available_zones" {
+  type    = map(list(string))
+  default = {
+    "cn-shanghai": ["cn-shanghai-g"]
+  }
+  description = "The zones per region that are supported for the type of ECS instances used"
+}
+
 variable "node_max_bandwidth" {
   default = 100
 }
@@ -157,9 +165,4 @@ variable "cen_id" {
 
 variable "region" {
   default = ""
-}
-
-variable "zone_ids" {
-  type    = map(string)
-  default = {}
 }

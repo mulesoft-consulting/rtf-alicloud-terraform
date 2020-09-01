@@ -19,8 +19,15 @@ resource "alicloud_vswitch" "public" {
     count.index,
   )
 
-  count             = var.existing_vpc_id != "" ? 0 : length(data.alicloud_zones.available.zones[*].id)
-  availability_zone = element(data.alicloud_zones.available.zones[*].id, count.index)
+  count             = var.existing_vpc_id != "" ? 0 : length(lookup(var.available_zones, var.region, data.alicloud_zones.available.zones[*].id))
+  availability_zone = element(
+    lookup(
+      var.available_zones, 
+      var.region, 
+      data.alicloud_zones.available.zones[*].id
+    ), 
+    count.index
+  )
 
   tags = {
     Name = "${var.cluster_name}-subnet"
