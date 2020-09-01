@@ -1,5 +1,3 @@
-provider "alicloud" {}
-
 resource "random_string" "cluster_token" {
   length  = 16
   special = false
