@@ -11,12 +11,12 @@ variable cluster_proxy_region {
 }
 
 provider "alicloud" {
-  alias = "cluster"
+  alias  = "cluster"
   region = var.cluster_region
 }
 
 provider "alicloud" {
-  alias = "cluster_proxy"
+  alias  = "cluster_proxy"
   region = var.cluster_proxy_region
 }
 
