@@ -90,7 +90,7 @@ $ terraform apply \
 
 Sometimes the deployment takes a little bit of time to create all the stack and some elements take more time than others which can provoke a timeout kind of error that makes the deployment fail. 
 
-For example the following error 
+**Resource not ready**
 ```bash
 Error: [ERROR] terraform-provider-alicloud/alicloud/resource_alicloud_instance.go:428: Resource alicloud_instance RunInstances Failed!!! [SDK alibaba-cloud-sdk-go ERROR]:
 SDK.ServerError
@@ -99,9 +99,26 @@ Recommend: https://error-center.aliyun.com/status/search?Keyword=IncorrectVSwitc
 RequestId: EE42C3F4-F222-4E3C-A9DC-76F644031264
 Message: The current status of vSwitch does not support this operation.
 ```
-This is provoked by the fact that the `VSwitch` resource is not completely ready and its status is not the one terraform is hoping for. 
+```bash
+ErrorCode: IncorrectStatus.cbnStatus
+Recommend: https://error-center.aliyun.com/status/search?Keyword=IncorrectStatus.cbnStatus&source=PopGw
+RequestId: 7FBF738E-C773-42FA-B7CC-38E26D885255
+Message: Current CBN status does not support this operation.
+```
 
-In order to correct that, just execute the apply once again. Terraform will automatically detect that you already have some elements of the stack and will build a new plan to suit your situation.
+This is provoked by the fact that the resource is not completely ready and its status is not the one terraform is hoping for. 
+
+In order to correct that, just re execute the apply or destroy (depending on what you were performing) once again. Terraform will automatically detect that you already have some elements of the stack and will react accordingly.
+
+**OperationConflict**
+```bash
+ErrorCode: OperationConflict
+Recommend: https://error-center.aliyun.com/status/search?Keyword=OperationConflict&source=PopGw
+RequestId: CF02F11B-6CFA-40D6-8CF8-CC47C1F5EFF3
+Message: The operation against this instance is too frequent, please try again later.
+```
+
+This is provoked by the fact that terraform is performing operation too quickly for alicloud to absorb so it fails. This happens usually when you try to destroy your terraform formation. Just re-run the command in this situation, Terraform is smart enough to pick it up where it left.  
 
 
 ## Links

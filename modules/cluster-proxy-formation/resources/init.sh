@@ -1,9 +1,9 @@
 #!/bin/bash
 
 yum update -y
-yum install nginx
+yum install nginx -y
 
-cat >> /etc/nginx/conf.d/rtf-proxy.conf <<EOF
+cat >> /etc/nginx/nginx.conf <<EOF
 user nginx;
 worker_processes auto;
 error_log /var/log/nginx/error.log;

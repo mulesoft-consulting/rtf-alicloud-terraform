@@ -1,6 +1,6 @@
 # VPC
 resource "alicloud_vpc" "vpc" {
-  name           = "${var.cluster_name}-vpc"
+  name           = "${var.name}-vpc"
   cidr_block     = var.vpc_cidr
   count          = var.existing_vpc_id != "" ? 0 : 1
 }
@@ -18,7 +18,7 @@ resource "alicloud_vswitch" "public" {
   availability_zone = element(data.alicloud_zones.available.zones[*].id, count.index)
 
   tags = {
-    Name = "${var.cluster_name}-subnet"
+    Name = "${var.name}-subnet"
     ROLE = var.role_tag_value
   }
   
@@ -28,7 +28,7 @@ resource "alicloud_vswitch" "public" {
 resource "alicloud_route_table" "rt" {
   vpc_id      = alicloud_vpc.vpc[0].id
   count       = var.existing_vpc_id != "" ? 0 : 1
-  name        = "${var.cluster_name}-rt"
+  name        = "${var.name}-rt"
 }
 
 # RT Association to Subnet
@@ -39,7 +39,7 @@ resource "alicloud_route_table_attachment" "rta" {
 }
 
 resource "alicloud_key_pair" "key"{
-  key_name  = var.key_pair
+  key_name   = var.key_pair
   public_key = var.public_key
 }
 
@@ -53,7 +53,7 @@ resource "alicloud_instance" "proxy" {
   instance_type                 = var.instance_type
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   vswitch_id                    = element(concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id), 0)
-  security_groups               = [alicloud_security_group.cluster.id]
+  security_groups               = [alicloud_security_group.proxy.id]
   instance_name                 = "${var.name}-proxy"
   
   key_name  = var.key_pair

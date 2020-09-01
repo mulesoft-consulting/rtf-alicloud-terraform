@@ -26,6 +26,15 @@ variable "node_max_bandwidth" {
   default = 100
 }
 
+variable "existing_vpc_id" {
+  default = ""
+}
+
+variable "existing_subnet_ids" {
+  type = list(string)
+  default = []
+}
+
 variable "role_tag_value" {
   default = "RuntimeFabric-proxy-terraform"
 }
@@ -37,3 +46,16 @@ variable "vpc_cidr" {
 variable "cluster_vpc_cidr" {
   default = "172.31.0.0/16"
 }
+
+variable "enable_public_ips" {
+  default = true
+}
+
+variable "cen_id" {
+  default = ""
+}
+
+variable "region" {
+  default = ""
+}
+

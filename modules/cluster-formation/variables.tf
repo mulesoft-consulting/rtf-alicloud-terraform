@@ -113,6 +113,10 @@ variable "service_cidr_block" {
   default = "10.100.0.0/16"
 }
 
+variable "proxy_private_ip" {
+  default = ""
+}
+
 variable "http_proxy" {
   default = ""
 }
@@ -145,4 +149,17 @@ variable "service_gid" {
 
 variable "agent_url" {
   default = ""
+}
+
+variable "cen_id" {
+  default = ""
+}
+
+variable "region" {
+  default = ""
+}
+
+variable "zone_ids" {
+  type    = map(string)
+  default = {}
 }

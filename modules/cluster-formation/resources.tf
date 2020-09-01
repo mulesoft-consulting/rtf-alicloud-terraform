@@ -43,6 +43,7 @@ resource "alicloud_route_table_attachment" "rta" {
   route_table_id = alicloud_route_table.rt[0].id
 }
 
+# ECS INSTANCES KEY PAIR
 resource "alicloud_key_pair" "key"{
   key_name  = var.key_pair
   public_key = var.public_key

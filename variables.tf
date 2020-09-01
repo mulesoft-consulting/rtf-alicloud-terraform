@@ -6,7 +6,7 @@ variable cluster_region {
 
 variable cluster_proxy_region {
   type        = string
-  default     = "eu-central-1"
+  default     = ""
   description = "the cluster proxy's region"
 }
 
@@ -35,7 +35,7 @@ variable "cluster_vpc_cidr" {
 }
 
 variable "cluster_proxy_vpc_cidr" {
-  default = "172.41.0.0/16"
+  default = "192.168.0.0/16"
 }
 
 variable "activation_data" {
@@ -65,3 +65,8 @@ variable "http_proxy" {
 variable "no_proxy" {
   default = ""
 }
+
+variable "cen_id" {
+  default = ""
+}
+
