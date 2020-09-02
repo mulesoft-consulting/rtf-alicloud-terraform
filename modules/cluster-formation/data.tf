@@ -18,10 +18,11 @@ data "alicloud_images" "nodes" {
 }
 
 data "template_file" "init_script" {
-  template = file("${path.module}/resources/init_orchestrator.sh")
+  template = file("${path.module}/resources/pre-init.sh")
 
   vars = {
     installer_scripts_url = var.installer_scripts_url
+    proxy_url             = var.http_proxy
   }
 }
 

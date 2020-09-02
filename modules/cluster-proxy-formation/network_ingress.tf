@@ -34,7 +34,7 @@ resource "alicloud_security_group_rule" "ingress_5044_tcp" {
 
 resource "alicloud_security_group_rule" "ingress_https" {
   type              = "ingress"
-  port_range        = "443/443"
+  port_range        = "${var.http_proxy_port}/${var.http_proxy_port}"
   ip_protocol       = "tcp"
   nic_type          = "intranet"
   policy            = "accept"

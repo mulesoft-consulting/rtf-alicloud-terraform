@@ -35,11 +35,13 @@ variable "ami_owner_id" {
 }
 
 variable "instance_type_controller" {
-  default = "ecs.g6e.large"
+  #default = "ecs.g6e.large"
+  default = ""
 }
 
 variable "instance_type_worker" {
-  default = "ecs.r6e.large"
+  #default = "ecs.r6e.large"
+  default = ""
 }
 
 variable "available_zones" {
@@ -122,6 +124,10 @@ variable "service_cidr_block" {
 }
 
 variable "proxy_private_ip" {
+  default = ""
+}
+
+variable "proxy_port" {
   default = ""
 }
 

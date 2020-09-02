@@ -59,3 +59,6 @@ variable "region" {
   default = ""
 }
 
+variable "http_proxy_port" {
+  default = 443
+}
