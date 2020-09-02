@@ -8,14 +8,16 @@ fi
 if [ "$#" -eq 1 ]; then
     terraform plan \
         -var-file="$1" \
-        -out=tf-data/rtf.plan
+        -state=tf-data/rtf.tfstate \
+        -out=tf-data/rtf.tfplan
 fi
 
 if [ "$#" -eq 2 ]; then
     terraform plan \
         -var-file="$1" \
         -target="$2" \
-        -out=tf-data/rtf.plan
+        -state=tf-data/rtf.tfstate \
+        -out=tf-data/rtf.tfplan
 fi
 
 
