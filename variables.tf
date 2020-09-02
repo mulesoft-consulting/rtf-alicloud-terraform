@@ -1,3 +1,11 @@
+variable "accessKeyId" {
+  default = ""
+}
+
+variable "accessKeySecret" {
+  default = ""
+}
+
 variable cluster_region {
   type        = string
   default     = ""
