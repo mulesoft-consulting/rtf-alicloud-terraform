@@ -1,5 +1,15 @@
 data "alicloud_zones" "available" { }
 
+/* data "alicloud_instance_types" "controller" {
+  cpu_core_count = 2
+  memory_size    = 8
+  network_type   = "vpc"
+}
+
+data "alicloud_instance_types" "worker" {
+  
+} */
+
 # Alicloud AMIs (Images)
 data "alicloud_images" "nodes" {
   owners      = var.ami_owner_id
@@ -72,7 +82,7 @@ data "template_file" "worker_env" {
 
 data "template_cloudinit_config" "installer" {
   gzip          = false
-  base64_encode = false
+  base64_encode = true
 
   part {
     filename     = "envvars.sh"
@@ -90,7 +100,7 @@ data "template_cloudinit_config" "installer" {
 
 data "template_cloudinit_config" "controller" {
   gzip          = false
-  base64_encode = false
+  base64_encode = true
 
   part {
     filename     = "envvars.sh"
@@ -108,7 +118,7 @@ data "template_cloudinit_config" "controller" {
 
 data "template_cloudinit_config" "worker" {
   gzip          = false
-  base64_encode = false
+  base64_encode = true
 
   part {
     filename     = "envvars.sh"

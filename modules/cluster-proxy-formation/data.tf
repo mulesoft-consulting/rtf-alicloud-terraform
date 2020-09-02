@@ -7,15 +7,22 @@ data "alicloud_images" "nodes" {
   name_regex  = var.ami_name
 }
 
+data "template_file" "init_script" {
+  template = file("${path.module}/resources/init.sh")
+
+  vars = {
+    nginx_conf = file("${path.module}/resources/nginx.conf")
+  }
+}
 
 data "template_cloudinit_config" "proxy" {
   gzip          = false
-  base64_encode = false
+  base64_encode = true
 
   part {
     filename     = "init.sh"
     content_type = "text/x-shellscript"
-    content      = file("${path.module}/resources/init.sh")
+    content      = data.template_file.init_script.rendered
   }
   
 }
