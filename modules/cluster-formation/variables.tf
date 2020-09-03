@@ -26,28 +26,26 @@ variable "installer_scripts_url" {
   default= "https://anypoint.mulesoft.com/runtimefabric/api/download/scripts/latest"
 }
 
-variable "ami_name" {
-  default = "^centos_7_8"
-}
-
-variable "ami_owner_id" {
-  default = "system"
+variable "image_id" {
+  default = "centos_7_8_x64_20G_alibase_20200717.vhd"
 }
 
 variable "instance_type_controller" {
-  #default = "ecs.g6e.large"
-  default = ""
+  default = "ecs.g6e.large"
 }
 
 variable "instance_type_worker" {
-  #default = "ecs.r6e.large"
-  default = ""
+  default = "ecs.r6e.large"
 }
 
 variable "available_zones" {
   type    = map(list(string))
   default = {
-    "cn-shanghai": ["cn-shanghai-g"]
+    "cn-shanghai": ["cn-shanghai-g"],
+    "cn-beijing": ["cn-beijing-h"],
+    "cn-qingdao": ["cn-qingdao-b"],
+    "cn-hangzhou": ["cn-hangzhou-i", "cn-hangzhou-h"],
+    "cn-zhangjiakou": ["cn-zhangjiakou-b"]
   }
   description = "The zones per region that are supported for the type of ECS instances used"
 }

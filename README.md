@@ -9,17 +9,6 @@ Make sure to install alibaba cloud CLI. [link](https://partners-intl.aliyun.com/
 
 Make sure to install terraform. [link](https://learn.hashicorp.com/tutorials/terraform/install-cli).
 
-## ENVIRONMENT
-
-You need to provide alibaba cloud credentials `ALICLOUD_ACCESS_KEY`, `ALICLOUD_SECRET_KEY` and `ALICLOUD_REGION` as environment variables. 
-
-usage : 
-
-```
-$ export ALICLOUD_ACCESS_KEY="anaccesskey"
-$ export ALICLOUD_SECRET_KEY="asecretkey"
-$ export ALICLOUD_REGION="cn-beijing"
-```
 
 ## ENCODE MULE LICENSE KEY
 

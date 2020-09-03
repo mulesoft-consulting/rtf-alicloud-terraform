@@ -1,12 +1,5 @@
 data "alicloud_zones" "available" { }
 
-# Alicloud AMIs (Images)
-data "alicloud_images" "nodes" {
-  owners      = var.ami_owner_id
-  most_recent = true
-  name_regex  = var.ami_name
-}
-
 data "template_file" "init_script" {
   template = file("${path.module}/resources/init.sh")
 

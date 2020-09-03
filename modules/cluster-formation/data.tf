@@ -1,22 +1,5 @@
 data "alicloud_zones" "available" { }
 
-/* data "alicloud_instance_types" "controller" {
-  cpu_core_count = 2
-  memory_size    = 8
-  network_type   = "vpc"
-}
-
-data "alicloud_instance_types" "worker" {
-  
-} */
-
-# Alicloud AMIs (Images)
-data "alicloud_images" "nodes" {
-  owners      = var.ami_owner_id
-  most_recent = true
-  name_regex  = var.ami_name
-}
-
 data "template_file" "init_script" {
   template = file("${path.module}/resources/pre-init.sh")
 

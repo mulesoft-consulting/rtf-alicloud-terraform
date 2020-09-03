@@ -31,7 +31,6 @@ resource "alicloud_vswitch" "public" {
 
   tags = {
     Name = "${var.cluster_name}-subnet"
-    ROLE = var.role_tag_value
   }
   
 }
@@ -105,7 +104,7 @@ locals {
 }
 
 resource "alicloud_instance" "installer_node" {
-  image_id                      = data.alicloud_images.nodes.images[0].id
+  image_id                      = var.image_id
   instance_type                 = var.instance_type_controller
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   vswitch_id                    = element(concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id), 0)
@@ -149,7 +148,7 @@ resource "alicloud_instance" "installer_node" {
 
 
 resource "alicloud_instance" "controller_node" {
-  image_id                      = data.alicloud_images.nodes.images[0].id
+  image_id                      = var.image_id
   instance_type                 = var.instance_type_controller
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   security_groups               = [alicloud_security_group.cluster.id]
@@ -198,7 +197,7 @@ resource "alicloud_instance" "controller_node" {
 
 
 resource "alicloud_instance" "worker_node" {
-  image_id                      = data.alicloud_images.nodes.images[0].id
+  image_id                      = var.image_id
   instance_type                 = var.instance_type_worker
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   security_groups               = [alicloud_security_group.cluster.id]

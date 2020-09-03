@@ -10,12 +10,8 @@ variable "name" {
   default = "mrRobot-runtime-fabric-proxy"
 }
 
-variable "ami_name" {
-  default = "^centos_7_8"
-}
-
-variable "ami_owner_id" {
-  default = "system"
+variable "image_id" {
+  default = "centos_7_8_x64_20G_alibase_20200717.vhd"
 }
 
 variable "instance_type" {

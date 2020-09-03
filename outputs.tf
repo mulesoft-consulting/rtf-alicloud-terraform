@@ -12,13 +12,13 @@ output "controller_private_ips" {
 }
 
 output "worker_private_ips" {
-  value = module.rtf_cluster.controller_private_ips
+  value = module.rtf_cluster.worker_private_ips
 }
 
 output "controller_public_ips" {
-  value = module.rtf_cluster.controller_private_ips
+  value = module.rtf_cluster.controller_public_ips
 }
 
 output "worker_public_ips" {
-  value = module.rtf_cluster.controller_private_ips
+  value = module.rtf_cluster.worker_public_ips
 }

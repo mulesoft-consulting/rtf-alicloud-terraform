@@ -19,9 +19,7 @@ resource "alicloud_vswitch" "public" {
 
   tags = {
     Name = "${var.name}-subnet"
-    ROLE = var.role_tag_value
   }
-  
 }
 
 # ROUTE TABLE FOR THE VPC
@@ -49,7 +47,7 @@ locals {
 }
 
 resource "alicloud_instance" "proxy" {
-  image_id                      = data.alicloud_images.nodes.images[0].id
+  image_id                      = var.image_id
   instance_type                 = var.instance_type
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   vswitch_id                    = element(concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id), 0)
