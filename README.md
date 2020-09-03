@@ -3,7 +3,6 @@
 This project aims to provide a configurable tool to install runtime fabric into alibaba cloud.
 
 ## ANATOMY
-
 Deployment to alicloud in Mainland China is trickier than in other regions like Europe due to the Great Firewall of China. Likely, Alicloud provides some tools to overcomes this by connecting your cluster inside Mainland China to a proxy outside and route the traffic to that proxy. 
 
 So, in order to support these different requirements, the scripts were designed to create 2 modules: 
@@ -21,7 +20,6 @@ It is also possible to only install the Blue module.
 Make sure to install alibaba cloud CLI. [link](https://partners-intl.aliyun.com/help/doc-detail/139508.htm).
 
 Make sure to install terraform. [link](https://learn.hashicorp.com/tutorials/terraform/install-cli).
-
 
 ## ENCODE MULE LICENSE KEY
 
@@ -52,7 +50,6 @@ base64 -w0 license.lic
 ## Run
 
 #### List of Parameters
-
 | Name                | Description           | Example   |
 | --------------------|:----------------------|-----------|
 | activation_data     | The encoded Runtime Fabric activation data. You can access this data by viewing your Runtime Fabric in Runtime Manager. | NzdlMzU1YTktMzAxMC00ODdxxxx |
@@ -72,7 +69,6 @@ base64 -w0 license.lic
 >**IMPORTANT** You will find an example file `example.tfvars.json` containing a template of the most important parameters you can use.
 
 #### Script helpers
-
 The project comes with a **bin** folder that contains some `bash` scripts:
 * plan.sh: executes terraform plan 
 * apply.sh: executes terraform apply
@@ -82,8 +78,7 @@ We highly encourage using them because they integrate important parameters like 
 
 In order to use the these script you need at least to provide the location of the parameter file (see parameter section). You can also specify which module to evaluate, that way we can navigate between the actual cluster and the proxy.
 
-#### Steps
-
+#### How to deploy formation
 1. Navigate to the project root directory. You must run Terraform from this directory.
 2. Initialize Terraform
     ```bash
@@ -112,9 +107,27 @@ In order to use the these script you need at least to provide the location of th
          ```
          **Note** that we didn't add the third parameter on purpose in order to allow terraform to process the full formation and evaluate the existing proxy formation to retrieve the IP addresses...
 
+## MONITORING
+To view the progress during the installation, tail the output log on each VM:
+1. Open a shell (or SSH session) to the first controller VM.
+2. Tail the output log, located at /var/log/rtf-init.log using the following command:
+   ```bash
+   $ tail -f /var/log/rtf-init.log
+   ```
+
+## DESTROY
+In order to destroy the formation you need to remove the **cluster** module (Blue) before removing the **proxy** (Blue part), assuming that you deployed the full formation. For that you can follow these steps:
+1. We assume you already have you environment setup. Otherwise read the **Run** section.
+2. Remove the cluster
+   ```bash
+   $ ./bin/destroy.sh /path/to/params.tfvar.json module.rtf_cluster
+   ```
+3. Remove the cluster proxy (if you deployed one)
+   ```bash
+   $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster_proxy
+   ```
 
 ## COMMON ERRORS
-
 Sometimes the deployment takes a little bit of time to create all the stack and some elements take more time than others which can provoke a timeout kind of error that makes the deployment fail. 
 
 **Resource not ready**
@@ -149,7 +162,6 @@ This is provoked by the fact that terraform is performing operation too quickly 
 
 
 ## Links
-
 - List of Alibaba regions (codes): [link](https://www.alibabacloud.com/help/doc-detail/40654.htm)
 - List of Alibaba Zones (codes): [link](https://www.alibabacloud.com/help/doc-detail/89155.htm)
 - Runtime Fabric install guide for AWS: [link](https://docs.mulesoft.com/runtime-fabric/latest/install-aws)

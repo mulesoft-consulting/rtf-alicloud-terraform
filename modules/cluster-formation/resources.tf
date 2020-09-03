@@ -110,6 +110,7 @@ resource "alicloud_instance" "installer_node" {
   vswitch_id                    = element(concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id), 0)
   security_groups               = [alicloud_security_group.cluster.id]
   instance_name                 = "${var.cluster_name}-controller"
+  host_name                     = "${var.cluster_name}-controller"
   
   key_name  = var.key_pair
   count     = 1
@@ -153,6 +154,7 @@ resource "alicloud_instance" "controller_node" {
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   security_groups               = [alicloud_security_group.cluster.id]
   instance_name                 = "${var.cluster_name}-controller-${count.index}"
+  host_name                     = "${var.cluster_name}-controller-${count.index}"
 
   vswitch_id                    = element(
     concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id),
@@ -202,6 +204,7 @@ resource "alicloud_instance" "worker_node" {
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   security_groups               = [alicloud_security_group.cluster.id]
   instance_name                 = "${var.cluster_name}-worker-${count.index}"
+  host_name                     = "${var.cluster_name}-worker-${count.index}"
 
   vswitch_id                    = element(
     concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id),

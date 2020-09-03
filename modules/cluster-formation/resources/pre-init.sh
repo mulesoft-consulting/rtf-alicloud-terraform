@@ -27,7 +27,7 @@ fi
 
 # Downloading installer scripts
 echo "* Downloading RTF scripts..."
-curl -L "$SCRIPTS_URL"  --output ~/rtf-install-scripts.zip
+curl -L $SCRIPTS_URL  --output ~/rtf-install-scripts.zip
 
 # DEACTIVATING PROXY FOR CURL
 export http_proxy=""

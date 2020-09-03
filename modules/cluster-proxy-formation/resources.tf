@@ -53,6 +53,7 @@ resource "alicloud_instance" "proxy" {
   vswitch_id                    = element(concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id), 0)
   security_groups               = [alicloud_security_group.proxy.id]
   instance_name                 = "${var.name}-proxy"
+  host_name                     = "${var.name}-proxy"
   
   key_name  = var.key_pair
   count     = 1
