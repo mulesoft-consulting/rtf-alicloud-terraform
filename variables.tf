@@ -1,8 +1,8 @@
-variable "accessKeyId" {
+variable "access_key_id" {
   default = ""
 }
 
-variable "accessKeySecret" {
+variable "access_key_secret" {
   default = ""
 }
 
