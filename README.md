@@ -2,6 +2,19 @@
 
 This project aims to provide a configurable tool to install runtime fabric into alibaba cloud.
 
+## ANATOMY
+
+Deployment to alicloud in Mainland China is trickier than in other regions like Europe due to the Great Firewall of China. Likely, Alicloud provides some tools to overcomes this by connecting your cluster inside Mainland China to a proxy outside and route the traffic to that proxy. 
+
+So, in order to support these different requirements, the scripts were designed to create 2 modules: 
+* RTF Cluster: which is our actual Runtime Fabric Cluster (Blue Part)
+* RTF Cluster Proxy: a formation that aims to optimize the traffic in case of a deployment in Mainland China (Green)
+
+![alt text](./fragments/img/overview.png "Overview")
+
+In order to setup the whole infrastructure, the Green module should come before the Blue module.
+
+It is also possible to only install the Blue module.
 
 ## INSTALL 
 
@@ -38,41 +51,66 @@ base64 -w0 license.lic
 
 ## Run
 
-**List of Parameters**
+#### List of Parameters
 
 | Name                | Description           | Example   |
 | --------------------|:----------------------|-----------|
-| activation_data     | The encoded Runtime Fabric activation data. You can access this data by viewing your Runtime Fabric in Runtime Manager. | NzdlMzU1YTktMzAxMC00OGE0LWJlMGQtMDdxxxx |
+| activation_data     | The encoded Runtime Fabric activation data. You can access this data by viewing your Runtime Fabric in Runtime Manager. | NzdlMzU1YTktMzAxMC00ODdxxxx |
 | key_pair            | The name of the keypair that is going to be created in the Alicloud region you are deploying to.|   my-keypair |
 | public_key          | The public key that will be stored. You should create a key pair localy using `ssh-keygen -t rsa -b 4096` and use the public here.|    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCiMk7m user@example.com|
 | enable_public_ips   | specifies whether the installer creates public IP addresses for each VM. Public IPs enable you to ssh directly to the VMs from your network. If this value is set to false(default) each VM only has access to the private network configured by its VPC. If you specify false, ensure you have consulted with your network administrator on how to obtain shell/SSH access to VMs.| true |
 | controllers         | the number of controller VMs to provision.|  1 |
 | workers             | the number of worker VMs to provision.    |  2 |
 | mule_license        | the base64 encoded contents of your organization’s Mule Enterprise license key (license.lic).| |
+| access_key_id       | The Access Key Id for alicloud CLI        | XXXXXXXX |
+| access_key_secret   | The Access Key Secret for alicloud CLI    | XXXXXXXX |
+| cluster_region      | The alibaba region where RTF cluster will be created you can checkout the links below this page for the complete list of alibaba regions. | cn-shanghai |
+| cluster_proxy_region| If you are deploying the cluster in Mainland China (for example cn-shanghai) you will need a proxy outside of Mainland China in order to optimize your traffic. This represents the region where the proxy will be created. Please refer to the section where the 2 different architectures are explained| eu-central-1 |
+| 
 
-**Steps**
+
+>**IMPORTANT** You will find an example file `example.tfvars.json` containing a template of the most important parameters you can use.
+
+#### Script helpers
+
+The project comes with a **bin** folder that contains some `bash` scripts:
+* plan.sh: executes terraform plan 
+* apply.sh: executes terraform apply
+* destroy.sh: executes terraform apply
+
+We highly encourage using them because they integrate important parameters like `-state` and `-out` while keeping a consitent location of the state accross different actions.
+
+In order to use the these script you need at least to provide the location of the parameter file (see parameter section). You can also specify which module to evaluate, that way we can navigate between the actual cluster and the proxy.
+
+#### Steps
 
 1. Navigate to the project root directory. You must run Terraform from this directory.
 2. Initialize Terraform
-```bash
-$ terraform init
-```
-3. Copy the following script to a text editor:
-```bash
-$ terraform apply \
-    -var activation_data='' \
-    -var key_pair='' \
-    -var public_key='' \
-    -var enable_public_ips='' \
-    -var controllers='1' \
-    -var workers='2' \
-    -var mule_license='' \
-    -state=tf-data/rtf.tfstate
-```
-
-4. Modify this using the data in the environment variables tables above.
-5. Ensure your terminal has access to the Alicloud-specific environment variables required as described above.
-6. Run the script.
+    ```bash
+    $ terraform init
+    ```
+3. Copy `example.tfvar.json` to another file. We will refer to it as `params.tfvar.json`.
+4. Fill `params.tfvar.json` using the data in the parameters table above. 
+5. Make the bin scripts executable using:
+    ```bash
+    $ chmod +x bin/*
+    ```
+5. Deploy your infrastructure depending on your type of formation:
+   1. Simple Mode: without proxy
+      * deploy the cluster using the command:
+         ```bash
+         $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster
+         ```
+   2. Full Mode: With proxy
+      1. deploy the cluster proxy module first using:
+         ```bash
+         $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster_proxy
+         ```
+      2. deploy the rest of the formation:
+         ```bash
+         $ ./bin/apply.sh /path/to/params.tfvar.json
+         ```
+         **Note** that we didn't add the third parameter on purpose in order to allow terraform to process the full formation and evaluate the existing proxy formation to retrieve the IP addresses...
 
 
 ## COMMON ERRORS
