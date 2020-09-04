@@ -62,8 +62,9 @@ base64 -w0 license.lic
 | access_key_id       | The Access Key Id for alicloud CLI        | XXXXXXXX |
 | access_key_secret   | The Access Key Secret for alicloud CLI    | XXXXXXXX |
 | cluster_region      | The alibaba region where RTF cluster will be created you can checkout the links below this page for the complete list of alibaba regions. | cn-shanghai |
-| cluster_proxy_region| If you are deploying the cluster in Mainland China (for example cn-shanghai) you will need a proxy outside of Mainland China in order to optimize your traffic. This represents the region where the proxy will be created. Please refer to the section where the 2 different architectures are explained| eu-central-1 |
-| 
+| cluster_proxy_region| If you are deploying the cluster in Mainland China (for example cn-shanghai) you will **need a proxy** outside of Mainland China in order to optimize your traffic. This variable represents the region where the proxy will be created. Please refer to the section where the 2 different architectures are explained. **Make sure leave empty if you don't neeed a proxy** | eu-central-1 |
+| cluster_vpc_cidr    | CIDR Block for the cluster's VPC          | 172.31.0.0/16  |
+| cluster_proxy_vpc_cidr | CIDR Block for the Cluster's Proxy VPC | 192.168.0.0/20 |  
 
 
 >**IMPORTANT** You will find an example file `example.tfvars.json` containing a template of the most important parameters you can use.
@@ -91,7 +92,7 @@ In order to use the these script you need at least to provide the location of th
     $ chmod +x bin/*
     ```
 5. Deploy your infrastructure depending on your type of formation:
-   1. Simple Mode: without proxy
+   1. Simple Mode: without proxy (Make sure to leave the `cluster_proxy_region` variable empty)
       * deploy the cluster using the command:
          ```bash
          $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster
@@ -101,7 +102,8 @@ In order to use the these script you need at least to provide the location of th
          ```bash
          $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster_proxy
          ```
-      2. deploy the rest of the formation:
+      2. Wait a couple of minutes (about 2min) to give the proxy the time to install the required libraries
+      3. deploy the rest of the formation:
          ```bash
          $ ./bin/apply.sh /path/to/params.tfvar.json
          ```
