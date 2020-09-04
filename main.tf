@@ -12,7 +12,7 @@ module "rtf_cluster" {
   anypoint_endpoint     = var.anypoint_endpoint
   mule_license          = var.mule_license
   enable_public_ips     = var.enable_public_ips
-  http_proxy            = var.cluster_proxy_region == "" ? "" : "https://${module.rtf_cluster_proxy[0].proxy_private_ip}:${module.rtf_cluster_proxy[0].http_proxy_port}" 
+  http_proxy            = var.cluster_proxy_region == "" ? "" : "${module.rtf_cluster_proxy[0].proxy_private_ip}:${module.rtf_cluster_proxy[0].http_proxy_port}" 
   no_proxy              = var.no_proxy
   region                = var.cluster_region
   cen_id                = var.cen_id
