@@ -102,7 +102,12 @@ In order to use the these script you need at least to provide the location of th
          ```bash
          $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster_proxy
          ```
-      2. Wait a couple of minutes (about 2min) to give the proxy the time to install the required libraries
+      2. Wait a couple of minutes (about 5min to 10min) to give the proxy the time to install and compile the required libraries
+         * If you want a more precise way to test if the proxy is up, Connect to the proxy machine and try to execute:
+            ```bash
+            $ curl https://www.mulesoft.com -svo /dev/null -x <PRIVATE_IP_PROXY>:443
+            ``` 
+            It should give you a 200 status code.
       3. deploy the rest of the formation:
          ```bash
          $ ./bin/apply.sh /path/to/params.tfvar.json

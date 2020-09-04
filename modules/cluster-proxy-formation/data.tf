@@ -4,7 +4,8 @@ data "template_file" "init_script" {
   template = file("${path.module}/resources/init.sh")
 
   vars = {
-    nginx_conf = file("${path.module}/resources/nginx.conf")
+    nginx_conf  = file("${path.module}/resources/nginx.conf")
+    nginx_initd = file("${path.module}/resources/nginx_initd.sh")
   }
 }
 
