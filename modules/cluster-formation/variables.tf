@@ -170,3 +170,8 @@ variable "cen_id" {
 variable "region" {
   default = ""
 }
+
+# Should be equal or less than 24
+variable "subnet_size"{
+  default = 24
+}

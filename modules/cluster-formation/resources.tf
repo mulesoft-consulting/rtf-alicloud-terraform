@@ -15,7 +15,7 @@ resource "alicloud_vswitch" "public" {
   vpc_id            = alicloud_vpc.vpc[0].id
   cidr_block        = cidrsubnet(
     var.vpc_cidr,
-    24 - replace(var.vpc_cidr, "/[^/]*[/]/", ""),
+    var.subnet_size - replace(var.vpc_cidr, "/[^/]*[/]/", ""),
     count.index,
   )
 
