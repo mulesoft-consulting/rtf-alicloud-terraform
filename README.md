@@ -122,6 +122,13 @@ To view the progress during the installation, tail the output log on each VM:
    $ tail -f /var/log/rtf-init.log
    ```
 
+To view the access logs for the forward proxy: 
+1. Open a shell (or SSH session) to the proxy VM.
+2. Tail the access log, located at /usr/local/nginx/logs/access.log using the following command:
+   ```bash
+   $ tail -f /usr/local/nginx/logs/access.log 
+   ```
+
 ## DESTROY
 In order to destroy the formation you need to remove the **cluster** module (Blue) before removing the **proxy** (Blue part), assuming that you deployed the full formation. For that you can follow these steps:
 1. We assume you already have you environment setup. Otherwise read the **Run** section.
