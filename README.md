@@ -180,3 +180,4 @@ This is provoked by the fact that terraform is performing operation too quickly 
 - List of Alibaba Zones (codes): [link](https://www.alibabacloud.com/help/doc-detail/89155.htm)
 - Runtime Fabric install guide for AWS: [link](https://docs.mulesoft.com/runtime-fabric/latest/install-aws)
 - Product Comparison AWS vs Alibaba: [link](http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/pdf/comparison-AlicloudlvsAWS-intl-en-2018-03-26.pdf)
+- How to use NGINX as an HTTPS Forward Proxy: [link](https://www.alibabacloud.com/blog/how-to-use-nginx-as-an-https-forward-proxy-server_595799#:~:text=NGINX%20was%20initially%20designed%20as,how%20to%20encrypt%20HTTPS%20traffic.)
