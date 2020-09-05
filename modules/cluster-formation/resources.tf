@@ -1,5 +1,3 @@
-provider "alicloud" {}
-
 resource "random_string" "cluster_token" {
   length  = 16
   special = false
@@ -17,16 +15,22 @@ resource "alicloud_vswitch" "public" {
   vpc_id            = alicloud_vpc.vpc[0].id
   cidr_block        = cidrsubnet(
     var.vpc_cidr,
-    24 - replace(var.vpc_cidr, "/[^/]*[/]/", ""),
+    var.subnet_size - replace(var.vpc_cidr, "/[^/]*[/]/", ""),
     count.index,
   )
 
-  count             = var.existing_vpc_id != "" ? 0 : length(data.alicloud_zones.available.zones[*].id)
-  availability_zone = element(data.alicloud_zones.available.zones[*].id, count.index)
+  count             = var.existing_vpc_id != "" ? 0 : length(lookup(var.available_zones, var.region, data.alicloud_zones.available.zones[*].id))
+  availability_zone = element(
+    lookup(
+      var.available_zones, 
+      var.region, 
+      data.alicloud_zones.available.zones[*].id
+    ), 
+    count.index
+  )
 
   tags = {
     Name = "${var.cluster_name}-subnet"
-    ROLE = var.role_tag_value
   }
   
 }
@@ -45,6 +49,7 @@ resource "alicloud_route_table_attachment" "rta" {
   route_table_id = alicloud_route_table.rt[0].id
 }
 
+# ECS INSTANCES KEY PAIR
 resource "alicloud_key_pair" "key"{
   key_name  = var.key_pair
   public_key = var.public_key
@@ -99,12 +104,13 @@ locals {
 }
 
 resource "alicloud_instance" "installer_node" {
-  image_id                      = data.alicloud_images.nodes.images[0].id
+  image_id                      = var.image_id
   instance_type                 = var.instance_type_controller
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   vswitch_id                    = element(concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id), 0)
   security_groups               = [alicloud_security_group.cluster.id]
   instance_name                 = "${var.cluster_name}-controller"
+  host_name                     = "${var.cluster_name}-controller"
   
   key_name  = var.key_pair
   count     = 1
@@ -143,11 +149,12 @@ resource "alicloud_instance" "installer_node" {
 
 
 resource "alicloud_instance" "controller_node" {
-  image_id                      = data.alicloud_images.nodes.images[0].id
+  image_id                      = var.image_id
   instance_type                 = var.instance_type_controller
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   security_groups               = [alicloud_security_group.cluster.id]
   instance_name                 = "${var.cluster_name}-controller-${count.index}"
+  host_name                     = "${var.cluster_name}-controller-${count.index}"
 
   vswitch_id                    = element(
     concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id),
@@ -192,11 +199,12 @@ resource "alicloud_instance" "controller_node" {
 
 
 resource "alicloud_instance" "worker_node" {
-  image_id                      = data.alicloud_images.nodes.images[0].id
+  image_id                      = var.image_id
   instance_type                 = var.instance_type_worker
   internet_max_bandwidth_out    = var.enable_public_ips ? var.node_max_bandwidth : 0
   security_groups               = [alicloud_security_group.cluster.id]
   instance_name                 = "${var.cluster_name}-worker-${count.index}"
+  host_name                     = "${var.cluster_name}-worker-${count.index}"
 
   vswitch_id                    = element(
     concat(var.existing_subnet_ids, alicloud_vswitch.public[*].id),

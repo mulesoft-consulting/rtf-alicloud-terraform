@@ -50,7 +50,7 @@ resource "alicloud_security_group_rule" "http_proxy_egress_traffic" {
   type              = "egress"
   port_range        = "${local.http_proxy_port}/${local.http_proxy_port}"
   ip_protocol       = "tcp"
-  nic_type          = "internet"
+  nic_type          = "intranet"
   policy            = "accept"
   priority          = 1
   security_group_id = alicloud_security_group.cluster.id

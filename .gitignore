@@ -1,3 +1,9 @@
+.DS_Store
+
 .terraform
 terraform.tfstate*
 tf-data
+
+bin/params.tfvars.json
+
+keys

@@ -2,24 +2,24 @@
 
 This project aims to provide a configurable tool to install runtime fabric into alibaba cloud.
 
+## ANATOMY
+Deployment to alicloud in Mainland China is trickier than in other regions like Europe due to the Great Firewall of China. Likely, Alicloud provides some tools to overcomes this by connecting your cluster inside Mainland China to a proxy outside and route the traffic to that proxy. 
+
+So, in order to support these different requirements, the scripts were designed to create 2 modules: 
+* RTF Cluster: which is our actual Runtime Fabric Cluster (Blue Part)
+* RTF Cluster Proxy: a formation that aims to optimize the traffic in case of a deployment in Mainland China (Green)
+
+![alt text](./fragments/img/overview.png "Overview")
+
+In order to setup the whole infrastructure, the Green module should come before the Blue module.
+
+It is also possible to only install the Blue module.
 
 ## INSTALL 
 
 Make sure to install alibaba cloud CLI. [link](https://partners-intl.aliyun.com/help/doc-detail/139508.htm).
 
 Make sure to install terraform. [link](https://learn.hashicorp.com/tutorials/terraform/install-cli).
-
-## ENVIRONMENT
-
-You need to provide alibaba cloud credentials `ALICLOUD_ACCESS_KEY`, `ALICLOUD_SECRET_KEY` and `ALICLOUD_REGION` as environment variables. 
-
-usage : 
-
-```
-$ export ALICLOUD_ACCESS_KEY="anaccesskey"
-$ export ALICLOUD_SECRET_KEY="asecretkey"
-$ export ALICLOUD_REGION="cn-beijing"
-```
 
 ## ENCODE MULE LICENSE KEY
 
@@ -49,48 +49,102 @@ base64 -w0 license.lic
 
 ## Run
 
-**List of Parameters**
-
+#### List of Parameters
 | Name                | Description           | Example   |
 | --------------------|:----------------------|-----------|
-| activation_data     | The encoded Runtime Fabric activation data. You can access this data by viewing your Runtime Fabric in Runtime Manager. | NzdlMzU1YTktMzAxMC00OGE0LWJlMGQtMDdxxxx |
+| activation_data     | The encoded Runtime Fabric activation data. You can access this data by viewing your Runtime Fabric in Runtime Manager. | NzdlMzU1YTktMzAxMC00ODdxxxx |
 | key_pair            | The name of the keypair that is going to be created in the Alicloud region you are deploying to.|   my-keypair |
 | public_key          | The public key that will be stored. You should create a key pair localy using `ssh-keygen -t rsa -b 4096` and use the public here.|    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCiMk7m user@example.com|
 | enable_public_ips   | specifies whether the installer creates public IP addresses for each VM. Public IPs enable you to ssh directly to the VMs from your network. If this value is set to false(default) each VM only has access to the private network configured by its VPC. If you specify false, ensure you have consulted with your network administrator on how to obtain shell/SSH access to VMs.| true |
 | controllers         | the number of controller VMs to provision.|  1 |
 | workers             | the number of worker VMs to provision.    |  2 |
 | mule_license        | the base64 encoded contents of your organization’s Mule Enterprise license key (license.lic).| |
+| access_key_id       | The Access Key Id for alicloud CLI        | XXXXXXXX |
+| access_key_secret   | The Access Key Secret for alicloud CLI    | XXXXXXXX |
+| cluster_region      | The alibaba region where RTF cluster will be created you can checkout the links below this page for the complete list of alibaba regions. | cn-shanghai |
+| cluster_proxy_region| If you are deploying the cluster in Mainland China (for example cn-shanghai) you will **need a proxy** outside of Mainland China in order to optimize your traffic. This variable represents the region where the proxy will be created. Please refer to the section where the 2 different architectures are explained. **Make sure leave empty if you don't neeed a proxy** | eu-central-1 |
+| cluster_vpc_cidr    | CIDR Block for the cluster's VPC          | 172.31.0.0/16  |
+| cluster_proxy_vpc_cidr | CIDR Block for the Cluster's Proxy VPC | 192.168.0.0/20 |  
 
-**Steps**
 
+>**IMPORTANT** You will find an example file `example.tfvars.json` containing a template of the most important parameters you can use.
+
+#### Script helpers
+The project comes with a **bin** folder that contains some `bash` scripts:
+* plan.sh: executes terraform plan 
+* apply.sh: executes terraform apply
+* destroy.sh: executes terraform apply
+
+We highly encourage using them because they integrate important parameters like `-state` and `-out` while keeping a consitent location of the state accross different actions.
+
+In order to use the these script you need at least to provide the location of the parameter file (see parameter section). You can also specify which module to evaluate, that way we can navigate between the actual cluster and the proxy.
+
+#### How to deploy formation
 1. Navigate to the project root directory. You must run Terraform from this directory.
 2. Initialize Terraform
-```bash
-$ terraform init
-```
-3. Copy the following script to a text editor:
-```bash
-$ terraform apply \
-    -var activation_data='' \
-    -var key_pair='' \
-    -var public_key='' \
-    -var enable_public_ips='' \
-    -var controllers='1' \
-    -var workers='2' \
-    -var mule_license='' \
-    -state=tf-data/rtf.tfstate
-```
+    ```bash
+    $ terraform init
+    ```
+3. Copy `example.tfvar.json` to another file. We will refer to it as `params.tfvar.json`.
+4. Fill `params.tfvar.json` using the data in the parameters table above. 
+5. Make the bin scripts executable using:
+    ```bash
+    $ chmod +x bin/*
+    ```
+5. Deploy your infrastructure depending on your type of formation:
+   1. Simple Mode: without proxy (Make sure to leave the `cluster_proxy_region` variable empty)
+      * deploy the cluster using the command:
+         ```bash
+         $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster
+         ```
+   2. Full Mode: With proxy
+      1. deploy the cluster proxy module first using:
+         ```bash
+         $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster_proxy
+         ```
+      2. Wait a couple of minutes (about 5min to 10min) to give the proxy the time to install and compile the required libraries
+         * If you want a more precise way to test if the proxy is up, Connect to the proxy machine and try to execute:
+            ```bash
+            $ curl https://www.mulesoft.com -svo /dev/null -x <PRIVATE_IP_PROXY>:443
+            ``` 
+            It should give you a 200 status code.
+      3. deploy the rest of the formation:
+         ```bash
+         $ ./bin/apply.sh /path/to/params.tfvar.json
+         ```
+         **Note** that we didn't add the third parameter on purpose in order to allow terraform to process the full formation and evaluate the existing proxy formation to retrieve the IP addresses...
 
-4. Modify this using the data in the environment variables tables above.
-5. Ensure your terminal has access to the Alicloud-specific environment variables required as described above.
-6. Run the script.
+## MONITORING
+To view the progress during the installation, tail the output log on each VM:
+1. Open a shell (or SSH session) to the first controller VM.
+2. Tail the output log, located at /var/log/rtf-init.log using the following command:
+   ```bash
+   $ tail -f /var/log/rtf-init.log
+   ```
 
+To view the access logs for the forward proxy: 
+1. Open a shell (or SSH session) to the proxy VM.
+2. Tail the access log, located at /usr/local/nginx/logs/access.log using the following command:
+   ```bash
+   $ tail -f /usr/local/nginx/logs/access.log 
+   ```
+
+## DESTROY
+In order to destroy the formation you need to remove the **cluster** module (Blue) before removing the **proxy** (Blue part), assuming that you deployed the full formation. For that you can follow these steps:
+1. We assume you already have you environment setup. Otherwise read the **Run** section.
+2. Remove the cluster
+   ```bash
+   $ ./bin/destroy.sh /path/to/params.tfvar.json module.rtf_cluster
+   ```
+3. Remove the cluster proxy (if you deployed one)
+   ```bash
+   $ ./bin/apply.sh /path/to/params.tfvar.json module.rtf_cluster_proxy
+   ```
 
 ## COMMON ERRORS
-
 Sometimes the deployment takes a little bit of time to create all the stack and some elements take more time than others which can provoke a timeout kind of error that makes the deployment fail. 
 
-For example the following error 
+**Resource not ready**
 ```bash
 Error: [ERROR] terraform-provider-alicloud/alicloud/resource_alicloud_instance.go:428: Resource alicloud_instance RunInstances Failed!!! [SDK alibaba-cloud-sdk-go ERROR]:
 SDK.ServerError
@@ -99,13 +153,30 @@ Recommend: https://error-center.aliyun.com/status/search?Keyword=IncorrectVSwitc
 RequestId: EE42C3F4-F222-4E3C-A9DC-76F644031264
 Message: The current status of vSwitch does not support this operation.
 ```
-This is provoked by the fact that the `VSwitch` resource is not completely ready and its status is not the one terraform is hoping for. 
+```bash
+ErrorCode: IncorrectStatus.cbnStatus
+Recommend: https://error-center.aliyun.com/status/search?Keyword=IncorrectStatus.cbnStatus&source=PopGw
+RequestId: 7FBF738E-C773-42FA-B7CC-38E26D885255
+Message: Current CBN status does not support this operation.
+```
 
-In order to correct that, just execute the apply once again. Terraform will automatically detect that you already have some elements of the stack and will build a new plan to suit your situation.
+This is provoked by the fact that the resource is not completely ready and its status is not the one terraform is hoping for. 
+
+In order to correct that, just re execute the apply or destroy (depending on what you were performing) once again. Terraform will automatically detect that you already have some elements of the stack and will react accordingly.
+
+**OperationConflict**
+```bash
+ErrorCode: OperationConflict
+Recommend: https://error-center.aliyun.com/status/search?Keyword=OperationConflict&source=PopGw
+RequestId: CF02F11B-6CFA-40D6-8CF8-CC47C1F5EFF3
+Message: The operation against this instance is too frequent, please try again later.
+```
+
+This is provoked by the fact that terraform is performing operation too quickly for alicloud to absorb so it fails. This happens usually when you try to destroy your terraform formation. Just re-run the command in this situation, Terraform is smart enough to pick it up where it left.  
 
 
 ## Links
-
-- List of Alibaba regions: [link](https://www.alibabacloud.com/help/doc-detail/40654.htm)
+- List of Alibaba regions (codes): [link](https://www.alibabacloud.com/help/doc-detail/40654.htm)
+- List of Alibaba Zones (codes): [link](https://www.alibabacloud.com/help/doc-detail/89155.htm)
 - Runtime Fabric install guide for AWS: [link](https://docs.mulesoft.com/runtime-fabric/latest/install-aws)
 - Product Comparison AWS vs Alibaba: [link](http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/pdf/comparison-AlicloudlvsAWS-intl-en-2018-03-26.pdf)

@@ -1,17 +1,11 @@
 data "alicloud_zones" "available" { }
 
-# Alicloud AMIs (Images)
-data "alicloud_images" "nodes" {
-  owners      = var.ami_owner_id
-  most_recent = true
-  name_regex  = var.ami_name
-}
-
 data "template_file" "init_script" {
-  template = file("${path.module}/resources/init_orchestrator.sh")
+  template = file("${path.module}/resources/pre-init.sh")
 
   vars = {
     installer_scripts_url = var.installer_scripts_url
+    proxy_url             = var.http_proxy
   }
 }
 
@@ -72,7 +66,7 @@ data "template_file" "worker_env" {
 
 data "template_cloudinit_config" "installer" {
   gzip          = false
-  base64_encode = false
+  base64_encode = true
 
   part {
     filename     = "envvars.sh"
@@ -90,7 +84,7 @@ data "template_cloudinit_config" "installer" {
 
 data "template_cloudinit_config" "controller" {
   gzip          = false
-  base64_encode = false
+  base64_encode = true
 
   part {
     filename     = "envvars.sh"
@@ -108,7 +102,7 @@ data "template_cloudinit_config" "controller" {
 
 data "template_cloudinit_config" "worker" {
   gzip          = false
-  base64_encode = false
+  base64_encode = true
 
   part {
     filename     = "envvars.sh"

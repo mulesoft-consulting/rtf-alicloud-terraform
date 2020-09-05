@@ -1,23 +1,24 @@
+output "proxy_private_ip" {
+  value = length(module.rtf_cluster_proxy) > 0 ? module.rtf_cluster_proxy[0].proxy_private_ip : ""
+}
+
+output "proxy_public_ip" {
+  value = length(module.rtf_cluster_proxy) > 0 ? module.rtf_cluster_proxy[0].proxy_public_ip : ""
+}
+
+
 output "controller_private_ips" {
-  value = join(
-    " ",
-    alicloud_instance.installer_node[*].private_ip,
-    alicloud_instance.controller_node[*].private_ip,
-  )
+  value = module.rtf_cluster.controller_private_ips
 }
 
 output "worker_private_ips" {
-  value = join(" ", alicloud_instance.worker_node[*].private_ip)
+  value = module.rtf_cluster.worker_private_ips
 }
 
 output "controller_public_ips" {
-  value = join(
-    " ",
-    alicloud_instance.installer_node[*].public_ip,
-    alicloud_instance.controller_node[*].public_ip,
-  )
+  value = module.rtf_cluster.controller_public_ips
 }
 
 output "worker_public_ips" {
-  value = join(" ", alicloud_instance.worker_node[*].public_ip)
+  value = module.rtf_cluster.worker_public_ips
 }
